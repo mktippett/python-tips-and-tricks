@@ -203,7 +203,7 @@ mamba install xesmf cf_xarray cmocean
 
 `mamba` will show what it plans to install and ask you to confirm — press `Enter` (or type `y` and `Enter`) to proceed.
 
-Use `mamba install` for packages from `conda-forge`. Use `pip install` only when a package isn't available through conda-forge.
+Use `mamba install` for packages from `conda-forge`. Use `pip install` only when a package isn't available through conda-forge — for instance, to read Earthmover's `pcodec`-compressed Zarr stores, do `pip install "numcodecs[pcodec]"` (the `pcodec` extra registers the codec with `numcodecs` so `zarr`/`xarray` can decode the chunks).
 
 After installing, you can check that it imported correctly:
 
