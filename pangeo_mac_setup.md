@@ -79,6 +79,21 @@ channels:
 dependencies:
   - python=3.12
   - pangeo-notebook=2026.01.21
+  # core geoscience stack — pangeo-notebook itself only brings JupyterLab + dask;
+  # these are the packages that actually do the geoscience work (see Step 8)
+  - xarray
+  - zarr
+  - netcdf4
+  - h5netcdf
+  - matplotlib
+  - cartopy
+  - cf_xarray
+  - fsspec
+  - gcsfs
+  - s3fs
+  - intake-xarray
+  - nc-time-axis
+  - bottleneck
   - pip
 EOF
 ```
@@ -200,8 +215,39 @@ If it prints `ok`, you're set.
 
 ## 8. What the environment file does (optional reading)
 
-This `environment.yml` is a trimmed-down version of Pangeo's official [`base-notebook` environment](https://github.com/pangeo-data/pangeo-docker-images/blob/master/base-notebook/environment.yml); the only meaningful change is the environment name (`pangeo-local`).
+`pangeo-notebook` is named for the *Pangeo* project, but despite the name it is
+**not** a geoscience package — it's a thin metapackage that brings in only the
+JupyterLab/JupyterHub/dask-gateway layer (`jupyterlab`, `jupyterhub-singleuser`,
+`dask-labextension`, `pangeo-dask` → `dask`/`distributed`, etc.). It pulls in
+*zero* of `xarray`, `zarr`, `netcdf4`, `matplotlib`, or any other geoscience
+library — confirmed by checking its declared dependencies directly, and true even
+of the official Pangeo Docker images' own
+[`base-notebook` environment](https://github.com/pangeo-data/pangeo-docker-images/blob/master/base-notebook/environment.yml)
+and [lock file](https://github.com/pangeo-data/pangeo-docker-images/blob/master/base-notebook/conda-linux-64.lock)
+(neither contains `xarray` or `zarr` either — that "official" environment is the
+Jupyter/dask layer alone, same as this one). If you only installed
+`pangeo-notebook`, you'd get a working JupyterLab with no science stack —
+exactly the (surprising, easy-to-hit) trap this guide's `environment.yml` now
+avoids by listing the geoscience packages explicitly.
 
-- `pangeo-notebook=2026.01.21` — a single conda-forge package that pulls in the whole Pangeo notebook toolset, so you don't have to list every library by hand.
+- `pangeo-notebook=2026.01.21` — the JupyterLab/Hub/dask layer described above:
+  what makes the environment show up and run as a notebook server, with
+  multi-core/cluster compute (`dask`/`distributed`) wired in. It does *not*
+  supply the geoscience stack — that's what the next group of packages is for.
+- `xarray`, `zarr`, `netcdf4`, `h5netcdf` — the core data model and file formats:
+  `xarray` for labeled N-D arrays, `zarr`/`netcdf4`/`h5netcdf` so it can read and
+  write the array/file formats geoscience data actually comes in.
+- `matplotlib`, `cartopy` — plotting, including map projections for geographic data.
+- `cf_xarray`, `nc-time-axis`, `bottleneck` — small utilities `xarray` leans on:
+  CF-convention-aware `.cf` accessors, plotting non-standard (e.g. `noleap`)
+  calendars, and faster rolling/groupby reductions.
+- `fsspec`, `gcsfs`, `s3fs`, `intake-xarray` — cloud-native data access: reading
+  Zarr/NetCDF straight out of Google Cloud Storage / S3 buckets and from data
+  catalogs, the way most public geoscience datasets (ERA5, CMIP6, etc.) are
+  actually distributed today.
 - `python=3.12` — sets the Python version.
 - `nodefaults` — keeps the environment on `conda-forge` and avoids mixing in packages from the default Anaconda channel.
+
+This list is a reasonable, broadly useful starting point — not exhaustive. Add
+more with Step 7 as your own work needs them (e.g. `xesmf` for regridding,
+`xskillscore` for verification metrics, `dask-jobqueue` for HPC clusters).
