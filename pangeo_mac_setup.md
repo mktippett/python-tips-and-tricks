@@ -83,6 +83,8 @@ dependencies:
   # these are the packages that actually do the geoscience work (see Step 8)
   - xarray
   - zarr
+  - cdsapi
+  - arraylake
   - netcdf4
   - h5netcdf
   - matplotlib
