@@ -83,6 +83,7 @@ dependencies:
   # these are the packages that actually do the geoscience work (see Step 8)
   - xarray
   - zarr
+  - scipy
   - cdsapi
   - arraylake
   - netcdf4
@@ -236,8 +237,8 @@ avoids by listing the geoscience packages explicitly.
   what makes the environment show up and run as a notebook server, with
   multi-core/cluster compute (`dask`/`distributed`) wired in. It does *not*
   supply the geoscience stack — that's what the next group of packages is for.
-- `xarray`, `zarr`, `netcdf4`, `h5netcdf` — the core data model and file formats:
-  `xarray` for labeled N-D arrays, `zarr`/`netcdf4`/`h5netcdf` so it can read and
+- `xarray`, `zarr`, `scipy`, `netcdf4`, `h5netcdf` — the core data model, numerical tools, and file formats:
+  `xarray` for labeled N-D arrays, `scipy` for scientific computing, and `zarr`/`netcdf4`/`h5netcdf` so it can read and
   write the array/file formats geoscience data actually comes in.
 - `matplotlib`, `cartopy` — plotting, including map projections for geographic data.
 - `cf_xarray`, `nc-time-axis`, `bottleneck` — small utilities `xarray` leans on:
